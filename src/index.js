@@ -29,16 +29,68 @@ function addClickListener(){
         e.preventDefault
 
         if (e.target.nodeName === "SPAN"){
-            renderDogProfile(e.target)
+            fetchDogProfile(e.target)
+        }
+
+        if (e.target.id === 'good-bad-button'){
+            toggleGoodness(e.target)
         }
     })
 }
 
-function renderDogProfile(eventTarget){
-    const dogId = eventTarget.dataset.id
-    debugger
+function fetchDogProfile(eventTarget){
+
+    fetch(DOG_URL + `/${eventTarget.dataset.id}`)
+    .then(resp => resp.json())
+    .then(dog => renderDogProfile(dog))
     
 }
 
+function renderDogProfile(dog){
+    const div = document.getElementById('dog-info')
+    div.innerHTML = ""
+
+    const img = document.createElement('img')
+    img.src = dog.image
+
+    const h2 = document.createElement('h2')
+    h2.innerText = dog.name
+
+    const button = document.createElement('button')
+    button.dataset.id = dog.id
+    button.id = 'good-bad-button'
+    if (dog.isGoodDog){
+        const goodness = "Good Dog!"
+        button.innerText = goodness
+    } else {
+        const goodness = "Bad Dog!"
+        button.innerText = goodness
+    }
+    
+    div.append(img, h2, button)
+}
+
+function toggleGoodness(eventTarget){
+
+    let goodness = {}
+
+    if (eventTarget.innerText === "Good Dog!"){
+        goodness = {isGoodDog: false}
+    } else {
+        goodness = {isGoodDog: true}
+    }
+
+    const reqObj = {
+        method: 'PATCH',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(goodness)
+    }
+
+    fetch(DOG_URL + `/${eventTarget.dataset.id}`, reqObj)
+    .then(resp => resp.json())
+    .then(dog => renderDogProfile(dog))
+}
 
 main()
