@@ -35,6 +35,23 @@ function addClickListener(){
         if (e.target.id === 'good-bad-button'){
             toggleGoodness(e.target)
         }
+
+        if (e.target.id === 'good-dog-filter'){
+            if (e.target.value === "false"){
+                e.target.value = "true"
+                e.target.innerText = "Filter good dogs: ON"
+                const dogBar = document.getElementById('dog-bar')
+                dogBar.innerHTML = ""
+                // e.target.innerHTML = ""
+                fetchGoodDogs()
+            } else {
+                e.target.value = "false"
+                e.target.innerText = "Filter good dogs: OFF"
+                const dogBar = document.getElementById('dog-bar')
+                dogBar.innerHTML = ""
+                fetchDogs()
+            }
+        }
     })
 }
 
@@ -91,6 +108,18 @@ function toggleGoodness(eventTarget){
     fetch(DOG_URL + `/${eventTarget.dataset.id}`, reqObj)
     .then(resp => resp.json())
     .then(dog => renderDogProfile(dog))
+}
+
+function fetchGoodDogs(){
+    fetch(DOG_URL)
+    .then(resp => resp.json())
+    .then(dogs => dogs.forEach(dog => renderGoodDog(dog)))
+}
+
+function renderGoodDog(dog){
+    if (dog.isGoodDog){
+        renderDog(dog)
+    }
 }
 
 main()
